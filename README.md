@@ -70,7 +70,8 @@ Schedule action in the cron GUI or run manually (`configctl zfs_plus besnapshot 
 Issue: static router can't be added as hostnames. We need routes to prevent "IT" (the firewall, which is not filtered by default and doesn't use VPN in multi gateway config) accessing WAN. We need it also to get proper IP in ACME or DDNS process.
 
 In RC or action hooks, you can slap some script:
-`echo -e "\n$(date) Refreshing static routes..."
+```
+echo -e "\n$(date) Refreshing static routes..."
 for host in freedns.afraid.org api.cloudflare.com staging.api.letsencrypt.org prod.api.letsencrypt.org cloudflare-dns.com 
     for ip in $(host -4t A $host | grep " has address " | cut -d' ' -f4); do
         case $host in
@@ -82,7 +83,8 @@ for host in freedns.afraid.org api.cloudflare.com staging.api.letsencrypt.org pr
             route add -inet $ip/32 -link -iface $iface && echo "Route of $host ($ip) to $iface added" || echo "Route of $host ($ip) to $iface not added"
         fi
     done
-done`
+done
+```
 
 > [!TIP]
 > Choose interfaces based on where you want to redirect it. Choose DDNS redirect based on which VPN is your entry point. Add all hostnames firewall and all its apps can use, except perhaps NTP and boostrap DNS.
@@ -96,6 +98,9 @@ Solution: schedule it, and report to email in case of issue.
 [actions_clamavscan.conf](actions_clamavscan.conf)
 
 Schedule action in the cron GUI or run manually (`configctl clamavscan reload`)
+
+> [!TIP]
+> Use postfix and make sure admin gets email by address or canonical rules (good to set up anyway).
 
 ## Schedule anything
 
@@ -111,3 +116,6 @@ Schedule action in the cron GUI or run manually (`configctl run @root rm -rf /va
 
 > [!TIP]
 > First argument is can be optionally a username starting with "@". Default user is nobody.
+
+> [!IMPORTANT]
+> You should check all the scripts before use. They're typically placed in admin's home folder, and store every output there (because firewall is not capturing), and forward or produce own exit codes.
