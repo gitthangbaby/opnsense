@@ -113,9 +113,10 @@ Solution: new cron action to run any command under any user
 Usage: `run.sh [@user] [command [..]]`
 
 Schedule action in the cron GUI or run manually (`configctl run @root rm -rf /var/db/ntopng`)
+![brave_nUiuoQGrim](https://github.com/gitthangbaby/opnsense/assets/57070151/8fc55f44-7e18-4ac9-9833-042d622432ea)
 
 > [!TIP]
 > First argument is can be optionally a username starting with "@". Default user is nobody.
 
 > [!IMPORTANT]
-> You should check all the scripts before use. They're typically placed in admin's home folder, and store every output there (because firewall is not capturing), and forward or produce own exit codes.
+> You should check all the scripts before use. No warranties. They do run in production, but not with everyones needs in mind. They're typically placed in admin's home folder, and store every output there (because firewall is not capturing), and forward or produce own exit codes.
