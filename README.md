@@ -35,7 +35,7 @@ Note that there are some limitations. Ntopng will not display specificic frequen
 python3 -m http.server --bind 127.0.0.1 --directory /var/db/aliastables/
 
 [actions_ntopng_plus.conf](actions_ntopng_plus.conf)
-Cron action to schedule in GUI or run manually (`configctl ntopng_plus blocklistsync`)
+Schedule action in the cron GUI or run manually (`configctl ntopng_plus blocklistsync`)
 
 Additionally, we want to choose what interfaces ntopng processes. This is a problem with GUI not able to select interfaces. Ntopng Community Edition has limit of 8. Likely, the limit will be crossed on many devices.
 [49-ntopngfix](49-ntopngfix)
@@ -49,7 +49,7 @@ Issue: Firewall is using ZFS without features. That's a total waste of space. Do
 
 Solution: introduce regular snapshotting per hour and day, and also creation of boot environments for dual reason: have even more snapshots, and be able to restore system after installtion during boot.
 
-[zfs_snapshot.sh](zfs_snapshot.sh)
+[zfs_snapshot.sh](zfs_snapshot.sh) [zfs_cleanup.sh](zfs_cleanup.sh)
 
 Usage:
 
@@ -60,7 +60,54 @@ Usage:
 This will keep creating snapshots per parameters, respecting minimal disk space. It will also emergency clean up the earlies snapshots if the disk is running out of space.
 
 [actions_zfs_plus.conf](actions_zfs_plus.conf)
-Cron action to schedule in GUI or run manually (`configctl zfs_plus besnapshot 10000000000`)
+Schedule action in the cron GUI or run manually (`configctl zfs_plus besnapshot 10000000000`)
 
 > [!TIP]
 > Calculate the expected snapshot usage yourself, and multiply by daily and hourly snapshots, to be able to fit all snapshots in the drive without hitting emergency cleanup. Some apps can radically increse the snapshot size (e.g. ntopng). Well, there's a fix for that too. You can rellocate ntopng data folder to NFS: `server:/mnt/shared /mnt/shared/ nfs rw,nolockd,retrycnt=1 0 0` in /etc/fstab and linking /mnt/shared/ntopng to /var/db/ntopng.
+
+## Route mess on VPN
+
+Issue: static router can't be added as hostnames. We need routes to prevent "IT" (the firewall, which is not filtered by default and doesn't use VPN in multi gateway config) accessing WAN. We need it also to get proper IP in ACME or DDNS process.
+
+In RC or action hooks, you can slap some script:
+`echo -e "\n$(date) Refreshing static routes..."
+for host in freedns.afraid.org api.cloudflare.com staging.api.letsencrypt.org prod.api.letsencrypt.org cloudflare-dns.com 
+    for ip in $(host -4t A $host | grep " has address " | cut -d' ' -f4); do
+        case $host in
+            freedns.afraid.org | api.cloudflare.com) iface=wg2;;
+            staging.api.letsencrypt.org | prod.api.letsencrypt.org | cloudflare-dns.com) iface=wg3;;
+            *) iface=wg1;;
+        esac
+        if [ "$iface" != "none" -a "$iface" != "" ]; then
+            route add -inet $ip/32 -link -iface $iface && echo "Route of $host ($ip) to $iface added" || echo "Route of $host ($ip) to $iface not added"
+        fi
+    done
+done`
+
+> [!TIP]
+> Choose interfaces based on where you want to redirect it. Choose DDNS redirect based on which VPN is your entry point. Add all hostnames firewall and all its apps can use, except perhaps NTP and boostrap DNS.
+
+## Regular antivirus scan
+
+Issue: like in many distros, antivirus exists, antivirus not able to run. 
+
+Solution: schedule it, and report to email in case of issue.
+
+[actions_clamavscan.conf](actions_clamavscan.conf)
+
+Schedule action in the cron GUI or run manually (`configctl clamavscan reload`)
+
+## Schedule anything
+
+Issue: there's no custom command in the GUI scheduler. We want to run anything, no doubt.
+
+Solution: new cron action to run any command under any user
+
+[actions_run.conf](actions_run.conf) [run.sh](run.sh)
+
+Usage: `run.sh [@user] [command [..]]`
+
+Schedule action in the cron GUI or run manually (`configctl run @root rm -rf /var/db/ntopng`)
+
+> [!TIP]
+> First argument is can be optionally a username starting with "@". Default user is nobody.
