@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# fix ntopng not able to choose interfaces
+
+#this file gets overwritten by the installation, but not later during service operation
+#interfaces - add what you want:
+interface="-i bridge0 -i vlan03 -i wg1"
+sed -i -e 's/^\(command_args.*-e\)\"/\1 $interfaces\"/' /usr/local/etc/rc.d/ntopng
