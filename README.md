@@ -118,5 +118,16 @@ Schedule action in the cron GUI or run manually (`configctl run @root rm -rf /va
 > [!TIP]
 > First argument is can be optionally a username starting with "@". Default user is nobody.
 
+## GeoIP data
+
+Issue: we don't want to sign up for MaxMind
+
+Solution: we're going to fetch GeoIP for firewall by using [alternative tool](https://github.com/cnbatch/GeoIP-Update-for-OPNsense), and GeoIP for ntopng from alternative source too
+
+[actions_geoip.conf](actions_geops.conf)
+
+Schedule action in the cron GUI or run manually (`configctl geoip reload` or `configctl run ntopreload`)
+
 > [!IMPORTANT]
 > You should check all the scripts before use. No warranties. They do run in production, but not with everyones needs in mind. They're typically placed in admin's home folder, and store every output there (because firewall is not capturing), and forward or produce own exit codes.
+
