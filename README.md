@@ -15,7 +15,7 @@ If your IP rules is what your filters is based on, you will not like ZenArmor so
 One solution is to let ntopng be the viewwer of the blocks. It's not efficient since it's double work, but better than nothing.
 
 [sync_blocklists_to_ntopng.sh](sync_blocklists_to_ntopng.sh)
-Will sync firewall blocklists with ntopng. Ntopng will immediatelly start using and marking your blocklists. The script can either parse the URL links and let ntopng fetch them with almost same frequency, or even better, it can directly read your processed blocklists from the filesystem if it's published on HTTP server:
+Will sync firewall blocklists with ntopng. Ntopng will immediatelly start using your blocklists and mark blocks as persistent alerts. The script can either parse the URL links and let ntopng fetch them with almost same frequency, or even better, it can directly read your processed blocklists from the filesystem if it's published on HTTP server:
 
 Usage:
 
@@ -120,14 +120,34 @@ Schedule action in the cron GUI or run manually (`configctl run @root rm -rf /va
 
 ## GeoIP data
 
-Issue: we don't want to sign up for MaxMind
+Issue: we don't want to sign up for MaxMind nor anything else
 
 Solution: we're going to fetch GeoIP for firewall by using [alternative tool](https://github.com/cnbatch/GeoIP-Update-for-OPNsense), and GeoIP for ntopng from alternative source too
 
-[actions_geoip.conf](actions_geops.conf)
+[actions_geoip.conf](actions_geoip.conf)
 
 Schedule action in the cron GUI or run manually (`configctl geoip reload` or `configctl run ntopreload`)
 
 > [!IMPORTANT]
 > You should check all the scripts before use. No warranties. They do run in production, but not with everyones needs in mind. They're typically placed in admin's home folder, and store every output there (because firewall is not capturing), and forward or produce own exit codes.
 
+## Blocklist sources
+
+DNS blocking
+
+> [!TIP]
+> Use AdGuard + dnsmasq for much better functionality and LAN resolution including single word hostnames for CONVENIENCE and Android compatibility
+
+Adguard GUI: All list you can imagine
+
+https://github.com/hagezi/dns-blocklists/ - big pool of DNS blocklists, see sources.md to extract the links
+
+IP blocking via aliases
+
+https://iplists.firehol.org/ - great processor but the packages are full of old stuff, take only individual lists, and watch for the last update time
+
+https://docs.danami.com/juggernaut/user-guide/ip-block-lists - very nice lists
+
+https://opendbl.net/#index.html - short list but with direct links
+
+https://github.com/cbuijs/accomplist - huge pool of DNS and IP blocklists, see .sources files to extract the links
