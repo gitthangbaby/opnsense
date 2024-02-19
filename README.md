@@ -37,7 +37,7 @@ python3 -m http.server --bind 127.0.0.1 --directory /var/db/aliastables/
 [actions_ntopng_plus.conf](actions_ntopng_plus.conf)
 Schedule action in the cron GUI or run manually (`configctl ntopng_plus blocklistsync`)
 
-Additionally, we want to choose what interfaces ntopng processes. This is a problem with GUI not able to select interfaces. Ntopng Community Edition has limit of 8. Likely, the limit will be crossed on many devices.
+Additionally, we want to choose what interfaces ntopng processes. This is a problem with GUI not able to select interfaces (since build 24.1.1 it can, you can use this alternatively to specify the order). Ntopng Community Edition has limit of 8. Likely, the limit will be crossed on many devices.
 [49-ntopngfix](49-ntopngfix)
 The startup script will define interfaces from that file. It will be valid until next installation _and_ reboot. Choose "None" in the GUI.
 
@@ -138,7 +138,7 @@ DNS blocking
 > [!TIP]
 > Use AdGuard + dnsmasq for much better functionality and LAN resolution including single word hostnames for CONVENIENCE and Android compatibility
 
-Adguard GUI: All list you can imagine
+Adguard GUI: All lists you can imagine
 
 https://github.com/hagezi/dns-blocklists/ - big pool of DNS blocklists, see sources.md to extract the links
 
